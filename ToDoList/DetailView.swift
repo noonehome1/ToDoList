@@ -8,30 +8,55 @@
 import SwiftUI
 
 struct DetailView: View {
-    var passedValue: String
-    //    @Environment(\.dismiss) private var dismiss
+    @State var toDo: String
+    @State private var reminderIsOn: Bool = false
+    @State private var completedIsOn: Bool = false
+//    @State private var dueDate: Date = Date.now + 60*60*24
+    @State private var dueDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date.now)!
+    @State private var notes: String = ""
+    
+    @Environment(\.dismiss) private var dismiss // Save this for manual control of return to previous navigation view. Pairs with some "dismiss()" action to cause the return.
+    
     var body: some View {
-        VStack {
-            Spacer()
-            Image(systemName: "swift")
-                .resizable()
-                .scaledToFit()
-                .foregroundStyle(.orange)
-            Spacer()
-            Text("You Are a Swifty Legend! And you passed the value of '\(passedValue)'")
-                .font(.largeTitle)
-                .multilineTextAlignment(.center)
+        List {
+            TextField("Enter ToDo Here!", text: $toDo)
+            
+            Toggle("Set Reminder:", isOn: $reminderIsOn)
+                .padding(.top)
+                .listRowSeparator(.hidden)
+            
+            DatePicker("Date:", selection: $dueDate)
+                .padding(.bottom)
+                .disabled(!reminderIsOn)
+                .listRowSeparator(.hidden)
+            
+            Text("Notes:")
+            TextField("Notes?", text: $notes, axis: .vertical)
+            
+            Toggle("Completed:", isOn: $completedIsOn)
+                .padding(.top)
+                .listRowSeparator(.hidden)
         }
-        .padding()
-
-        //        .navigationBarBackButtonHidden()
-        //
-        //        Button("Get Back!") {
-        //            dismiss()
-        //        }
+        .font(.title2)
+        .listStyle(.plain)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Save") {
+                    // TODO: Toolbar Item Save Action Here
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    DetailView(passedValue: "Preview Item 1")
+    NavigationStack {
+        DetailView(toDo: "")
+    }
 }
